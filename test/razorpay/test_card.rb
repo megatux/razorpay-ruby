@@ -5,6 +5,7 @@ module Razorpay
   class RazorpayCardTest < Minitest::Test
     def setup
       @card_id = 'card_7EZLhWkDt05n7V'
+      @client = RazorpayClient.new('key_id', 'key_secret')
 
       # Any request that ends with cards/card_id
       stub_get(%r{cards/#{@card_id}$}, 'fake_card')
@@ -15,7 +16,7 @@ module Razorpay
     end
 
     def test_cards_should_be_fetched
-      card = Razorpay::Card.fetch(@card_id)
+      card = Razorpay::Card.new(@client).fetch(@card_id)
       assert_instance_of Razorpay::Card, card, 'card not an instance of Razorpay::Card class'
       assert_equal @card_id, card.id, 'card IDs do not match'
     end

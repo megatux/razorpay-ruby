@@ -5,19 +5,19 @@ module Razorpay
   # Addon API allows you to fetch and delete
   # subscription-addons with Razorpay
   class Addon < Entity
-    def self.request
-      Razorpay::Request.new('addons')
+    def request
+      Razorpay::Request.new(@client, 'addons')
     end
 
-    def self.fetch(id)
+    def fetch(id)
       request.fetch id
     end
 
-    def self.all(options = {})
+    def all(options = {})
        request.all options
     end
 
-    def self.create(subscription_id, options)
+    def create(subscription_id, options)
       r = request
       # POST /addons is not supported
       # Addon creation endpoint is:
@@ -25,7 +25,7 @@ module Razorpay
       r.request :post, "/subscriptions/#{subscription_id}/addons", options
     end
 
-    def self.delete(id)
+    def delete(id)
       request.delete id
     end
   end

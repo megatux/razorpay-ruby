@@ -4,6 +4,7 @@ module Razorpay
   # Tests for Razorpay::PaymentLink
   class RazorpayPaymentLinkTest < Minitest::Test
     def setup
+      @client = RazorpayClient.new('key_id', 'key_secret')
       @payment_link_id = 'plink_J9feMU9xqHQVWX'
 
       # Any request that ends with payment_link/payment_link_id
@@ -40,7 +41,7 @@ module Razorpay
       }
 
       stub_post(/payment_links$/, 'fake_payment_link', param_attr.to_json)
-      payment_link = Razorpay::PaymentLink.create param_attr.to_json 
+      payment_link = Razorpay::PaymentLink.new(@client).create param_attr.to_json
       assert_equal @payment_link_id, payment_link.id
     end
 
@@ -52,30 +53,30 @@ module Razorpay
         "notes":{
           "policy_name": "Jeevan Saral"
         }
-      } 
+      }
 
       stub_patch(%r{payment_links/#{@payment_link_id}$}, 'fake_payment_link', para_attr.to_json)
-      payment_link = Razorpay::PaymentLink.edit(@payment_link_id,para_attr.to_json)
+      payment_link = Razorpay::PaymentLink.new(@client).edit(@payment_link_id,para_attr.to_json)
       assert_instance_of Razorpay::Entity, payment_link
       assert true, payment_link.accept_partial
     end
 
     def test_fetch_all_payment_link
       stub_get(/payment_links$/, 'payment_link_collection')
-      payment_link = Razorpay::PaymentLink.all
+      payment_link = Razorpay::PaymentLink.new(@client).all
       assert_instance_of Razorpay::Collection, payment_link
     end
 
     def test_fetch_specific_payment
-      stub_get(%r{payment_links/#{@payment_link_id}$}, 'fake_payment_link')  
-      payment_link = Razorpay::PaymentLink.fetch(@payment_link_id)
+      stub_get(%r{payment_links/#{@payment_link_id}$}, 'fake_payment_link')
+      payment_link = Razorpay::PaymentLink.new(@client).fetch(@payment_link_id)
       assert_instance_of Razorpay::Entity, payment_link
       assert_equal payment_link.id, @payment_link_id
     end
-    
+
    def test_notify_by_id
-      stub_post(%r{payment_links/#{@payment_link_id}/notify_by/email$}, 'payment_link_response',{})  
-      payment_link = Razorpay::PaymentLink.notify_by(@payment_link_id,"email")
+      stub_post(%r{payment_links/#{@payment_link_id}/notify_by/email$}, 'payment_link_response',{})
+      payment_link = Razorpay::PaymentLink.new(@client).notify_by(@payment_link_id,"email")
       assert_instance_of Razorpay::Entity, payment_link
       assert true, payment_link.success
    end

@@ -5,6 +5,7 @@ module Razorpay
   class RazorpaySubscriptionRegistrationTest < Minitest::Test
 
     def setup
+      @client = RazorpayClient.new('key_id', 'key_secret')
       @invoice_id = 'inv_JA7OELdAoxbzk7'
     end
 
@@ -50,7 +51,8 @@ module Razorpay
       }
 
       stub_post(%r{/subscription_registration/auth_links$}, 'fake_subscription_registration', param_attr.to_json)
-      subscription_registration = Razorpay::SubscriptionRegistration.create(param_attr.to_json)
+      subscription_registration =
+        Razorpay::SubscriptionRegistration.new(@client).create(param_attr.to_json)
       assert_instance_of Razorpay::Invoice, subscription_registration
       assert_equal subscription_registration.id, @invoice_id
     end

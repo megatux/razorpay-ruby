@@ -6,11 +6,11 @@ module Razorpay
   # Payment Methods class is allows you to create
   # to fetch all payment methods
   class PaymentMethods < Entity
-    def self.request
-      Razorpay::Request.new('methods')
+    def request
+      Razorpay::Request.new(@client, 'methods')
     end
-    
-    def self.all(options = {})
+
+    def all(options = {})
       request.all options
     end
   end

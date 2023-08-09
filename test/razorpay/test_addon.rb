@@ -6,6 +6,7 @@ module Razorpay
     class Item < Razorpay::Entity; end
 
     def setup
+      @client = RazorpayClient.new('key_id', 'key_secret')
       @subscription_id = 'sub_00000000000001'
       @addon_id = 'ao_IrSY3UIqDRx7df'
 
@@ -18,7 +19,7 @@ module Razorpay
     end
 
     def test_addon_should_be_available
-      addon = Razorpay::Addon.fetch(@addon_id)
+      addon = Razorpay::Addon.new(@client).fetch(@addon_id)
       assert_instance_of Razorpay::Addon, addon, 'Addon not an instance of Addon class'
       assert_equal @addon_id, addon.id, 'Addon IDs do not match'
       assert_equal 1, addon.quantity, 'Addon quantity is accessible'
@@ -30,7 +31,7 @@ module Razorpay
 
     def test_fetch_all_addon
       stub_get(/addons$/, 'addon_collection')
-      addons = Razorpay::Addon.all
+      addons = Razorpay::Addon.new(@client).all
       assert_instance_of Razorpay::Collection, addons, 'Addons should be an array'
       refute_empty addons.items, 'Addon should be more than one'
     end
@@ -46,7 +47,7 @@ module Razorpay
 
       stub_post(%r{subscriptions\/#{@subscription_id}\/addons$}, 'fake_addon', addon_attrs.to_json)
 
-      addon = Razorpay::Addon.create(@subscription_id, addon_attrs.to_json)
+      addon = Razorpay::Addon.new(@client).create(@subscription_id, addon_attrs.to_json)
       assert_instance_of Razorpay::Addon, addon, 'Addon not an instance of Addon class'
 
       assert_equal @addon_id, addon.id, 'Addon IDs do not match'
@@ -58,7 +59,7 @@ module Razorpay
     end
 
     def assert_addon_item_details(addon)
-      addon_item = Item.new(addon.item)
+      addon_item = Item.new(@client, addon.item)
 
       assert_equal 'item_00000000000001', addon_item.id, 'Addon Item id is accessible'
       assert_equal 'fake_item_name', addon_item.name, 'Addon Item name is accessible'
@@ -69,7 +70,7 @@ module Razorpay
 
     def test_delete_addon
       stub_delete(%r{addons/#{@addon_id}$}, 'empty')
-      addon = Razorpay::Addon.delete(@addon_id)
+      addon = Razorpay::Addon.new(@client).delete(@addon_id)
       assert_instance_of Razorpay::Entity, addon
     end
   end

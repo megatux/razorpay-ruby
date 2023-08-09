@@ -5,9 +5,10 @@ module Razorpay
   # This saves data in a hash internally, and makes it available
   # via direct methods
   class Entity
-    attr_reader :attributes
+    attr_reader :attributes, :client
 
-    def initialize(attributes)
+    def initialize(client, attributes = nil)
+      @client = client
       @attributes = attributes
     end
 

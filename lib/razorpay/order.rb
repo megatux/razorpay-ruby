@@ -5,32 +5,32 @@ module Razorpay
   # Order API allows you to associate
   # Payments with an order entity
   class Order < Entity
-    def self.request
-      Razorpay::Request.new('orders')
+    def request
+      Razorpay::Request.new(@client, 'orders')
     end
 
-    def self.create(options)
+    def create(options)
       request.create options
     end
 
-    def self.fetch(id)
+    def fetch(id)
       request.fetch id
     end
 
-    def self.all(options = {})
+    def all(options = {})
       request.all options
     end
 
     def payments(options = {})
-      r = self.class.request
+      r = request
       r.request :get, "/orders/#{id}/payments", options
     end
-    
-    def self.edit(id, options = {})
+
+    def edit(id, options = {})
       request.patch id, options
     end
-    
-    def self.fetch_transfer_order(id)
+
+    def fetch_transfer_order(id)
       # Fetch Transfer for an Order
       # Docs: https://razorpay.com/docs/api/payments/route/#fetch-transfer-for-an-order
       request.get "#{id}/?expand[]=transfers&status"

@@ -9,19 +9,22 @@ module Razorpay
   class Request
     include HTTParty
 
+    attr_reader :client
+
     ssl_ca_file File.dirname(__FILE__) + '/../ca-bundle.crt'
 
-    def initialize(entity_name = nil)
+    def initialize(client, entity_name = nil)
+      @client = client
       self.class.base_uri(Razorpay::BASE_URI)
       @entity_name = entity_name
-      custom_headers = Razorpay.custom_headers || {}
+      custom_headers = @client.custom_headers || {}
       predefined_headers = {
         'User-Agent' => "Razorpay-Ruby/#{Razorpay::VERSION}; Ruby/#{RUBY_VERSION}"
       }
       # Order is important to give precedence to predefined headers
       headers = custom_headers.merge(predefined_headers)
       @options = {
-        basic_auth: Razorpay.auth,
+        basic_auth: client.credentials.auth,
         timeout: 30,
         headers: headers
       }
@@ -40,9 +43,10 @@ module Razorpay
     end
 
     def get(url, data = {})
+      # binding.irb
       request :get, "/#{@entity_name}/#{url}", data
     end
-    
+
     def delete(url)
       request :delete, "/#{@entity_name}/#{url}"
     end
@@ -63,20 +67,20 @@ module Razorpay
       create_instance raw_request(method, url, data)
     end
 
-    def raw_request(method, url, data = {}) 
+    def raw_request(method, url, data = {})
       case method
       when :get
         @options[:query] = data
       when :post, :put, :patch
         @options[:body] = data
       end
-      
+
       self.class.send(method, url, @options)
     end
 
     # Since we need to change the base route
     def make_test_request
-      self.class.get Razorpay::TEST_URL, @options
+      get Razorpay::TEST_URL, @options
     end
 
     # Recursively builds entity instances
@@ -86,8 +90,8 @@ module Razorpay
 
       if response.is_a?(Array)==true || response.to_s.length == 0
         return response
-      end 
-      
+      end
+
       # if there was an error, throw it
       raise_error(response['error'], res.code) if response.nil? || response.key?('error') && res.code !=200
       # There must be a top level entity
@@ -100,7 +104,7 @@ module Razorpay
         # Use Entity class if we don't find any
         klass = Razorpay::Entity
       end
-      klass.new(response)
+      klass.new(client, response)
     end
 
     def raise_error(error, status)

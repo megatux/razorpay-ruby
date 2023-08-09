@@ -1,3 +1,4 @@
+require 'razorpay/credentials'
 require 'razorpay/card'
 require 'razorpay/order'
 require 'razorpay/errors'
@@ -23,15 +24,12 @@ require 'razorpay/payment_method'
 
 # Base Razorpay module
 module Razorpay
-  class << self
-    attr_accessor :auth, :custom_headers
-  end
+  class RazorpayClient
+    attr_reader :credentials, :custom_headers
 
-  def self.setup(key_id, key_secret)
-    self.auth = { username: key_id, password: key_secret }
-  end
-
-  def self.headers=(headers = {})
-    self.custom_headers = headers
+    def initialize(key_id, key_secret, custom_headers = {})
+      @credentials = ::Razorpay::Credentials.new(key_id, key_secret)
+      @custom_headers = custom_headers
+    end
   end
 end

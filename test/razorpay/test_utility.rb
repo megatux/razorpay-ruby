@@ -4,7 +4,7 @@ module Razorpay
   # Tests for Razorpay::Utility
   class RazorpayUtilityTest < Minitest::Test
     def setup
-      Razorpay.setup('key_id', 'key_secret')
+      @client = RazorpayClient.new('key_id', 'key_secret')
     end
 
     def test_payment_signature_verification
@@ -13,11 +13,11 @@ module Razorpay
         razorpay_payment_id: 'fake_payment_id',
         razorpay_signature: '965ee2de4c5c4e6f006fb0a5a1736d992e5d4d52f9fe10b98c9b97ee169ebe18'
       }
-      Razorpay::Utility.verify_payment_signature(payment_response)
+      Razorpay::Utility.new(@client).verify_payment_signature(payment_response)
 
       payment_response[:razorpay_signature] = '_dummy_signature' * 4
       assert_raises(SecurityError) do
-        Razorpay::Utility.verify_payment_signature(payment_response)
+        Razorpay::Utility.new(@client).verify_payment_signature(payment_response)
       end
     end
 
@@ -31,11 +31,11 @@ module Razorpay
         razorpay_signature: 'b8a6acda585c9b74e9da393c7354c7e685e37e69d30ae654730f042e674e0283'
       }
 
-      Razorpay::Utility.verify_payment_link_signature(payment_response)
+      Razorpay::Utility.new(@client).verify_payment_link_signature(payment_response)
 
-      payment_response[:razorpay_signature] = '_dummy_signature' * 4  
+      payment_response[:razorpay_signature] = '_dummy_signature' * 4
       assert_raises(SecurityError) do
-        Razorpay::Utility.verify_payment_link_signature(payment_response)
+        Razorpay::Utility.new(@client).verify_payment_link_signature(payment_response)
       end
     end
 
@@ -49,7 +49,7 @@ module Razorpay
         razorpay_signature: 'b8a6acda585c9b74e9da393c7354c7e685e37e69d30ae654730f042e674e0283'
       }
 
-      response = Razorpay::Utility.verify_payment_link_signature(payment_response)
+      response = Razorpay::Utility.new(@client).verify_payment_link_signature(payment_response)
       assert(response)
     end
 
@@ -61,11 +61,11 @@ module Razorpay
       }
       # A different signature is expected here compared to the previous test,
       # since the sorted order of the keys is different in this case
-      Razorpay::Utility.verify_payment_signature(payment_response)
+      Razorpay::Utility.new(@client).verify_payment_signature(payment_response)
 
       payment_response[:razorpay_signature] = '_dummy_signature' * 4
       assert_raises(SecurityError) do
-        Razorpay::Utility.verify_payment_signature(payment_response)
+        Razorpay::Utility.new(@client).verify_payment_signature(payment_response)
       end
     end
 
@@ -73,11 +73,11 @@ module Razorpay
       webhook_body = fixture_file('fake_payment_authorized_webhook')
       secret = 'chosen_webhook_secret'
       signature = 'dda9ca344c56ccbd90167b1be0fd99dfa92fe2b827020f27e2a46024e31c7c99'
-      Razorpay::Utility.verify_webhook_signature(webhook_body, signature, secret)
+      Razorpay::Utility.new(@client).verify_webhook_signature(webhook_body, signature, secret)
 
       signature = '_dummy_signature' * 4
       assert_raises(SecurityError) do
-        Razorpay::Utility.verify_webhook_signature(webhook_body, signature, secret)
+        Razorpay::Utility.new(@client).verify_webhook_signature(webhook_body, signature, secret)
       end
     end
   end

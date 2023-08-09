@@ -4,31 +4,31 @@ require 'razorpay/entity'
 module Razorpay
   # Transfer class handles all refund objects
   class Transfer < Entity
-    def self.request
-      Razorpay::Request.new('transfers')
+    def request
+      Razorpay::Request.new(@client, 'transfers')
     end
-    
-    def self.create(options)
+
+    def create(options)
       request.create options
     end
 
-    def self.all(options = {})
+    def all(options = {})
      request.all options
     end
 
-    def self.fetch(id)
+    def fetch(id)
       request.fetch id
     end
 
     def edit(options = {})
-      self.class.request.patch id, options
+      request.patch id, options
     end
 
     def reverse(options = {})
-      self.class.request.post "#{id}/reversals", options
+      request.post "#{id}/reversals", options
     end
 
-    def self.fetch_settlements
+    def fetch_settlements
       request.get "?expand[]=recipient_settlement"
     end
   end

@@ -5,23 +5,23 @@ module Razorpay
   # Virtual Account API allows you to create and
   # manage virtual accounts with Razorpay
   class VirtualAccount < Entity
-    def self.request
-      Razorpay::Request.new('virtual_accounts')
+    def request
+      Razorpay::Request.new(@client, 'virtual_accounts')
     end
 
-    def self.create(options)
+    def create(options)
       request.create options
     end
 
-    def self.fetch(id)
+    def fetch(id)
       request.fetch id
     end
 
-    def self.all(options = {})
+    def all(options = {})
       request.all options
     end
-    
-    def self.close(id)
+
+    def close(id)
        request.post "#{id}/close"
     end
 
@@ -30,19 +30,19 @@ module Razorpay
     end
 
     def payments(options = {})
-      r = self.class.request
+      r = request
       r.request :get, "/virtual_accounts/#{id}/payments", options
     end
 
-    def self.add_receiver(id, options = {})
+    def add_receiver(id, options = {})
       request.post "#{id}/receivers", options
     end
 
-    def self.allowed_payer(id, options = {})
+    def allowed_payer(id, options = {})
       request.post "#{id}/allowed_payers", options
     end
 
-    def self.delete_allowed_payer(id, payer_id)
+    def delete_allowed_payer(id, payer_id)
       request.delete "#{id}/allowed_payers/#{payer_id}"
     end
   end

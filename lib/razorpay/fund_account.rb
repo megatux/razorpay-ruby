@@ -2,17 +2,17 @@ require 'razorpay/request'
 require 'razorpay/entity'
 
 module Razorpay
-  # FundAccount API allows you to create and fetch a fund account for a customer. 
+  # FundAccount API allows you to create and fetch a fund account for a customer.
   class FundAccount < Entity
-    def self.request
-      Razorpay::Request.new('fund_accounts')
+    def request
+      Razorpay::Request.new(@client, 'fund_accounts')
     end
 
-    def self.create(options)
+    def create(options)
       request.create options
     end
 
-    def self.all(data = {})
+    def all(data = {})
       request.all data
     end
   end

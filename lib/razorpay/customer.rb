@@ -4,39 +4,39 @@ require 'razorpay/entity'
 module Razorpay
   # Customer API allows you to create and fetch customers on Razorpay
   class Customer < Entity
-    def self.request
-      Razorpay::Request.new('customers')
+    def request
+      Razorpay::Request.new(@client, 'customers')
     end
 
-    def self.create(options)
+    def create(options)
       request.create options
     end
 
-    def self.fetch(id)
+    def fetch(id)
       request.fetch id
     end
 
-    def self.edit(id, options = {})
+    def edit(id, options = {})
       request.put id, options
     end
 
-    def self.all(options = {})
+    def all(options = {})
       request.all options
     end
-    
+
     # Fetch token by customerId
-    # https://razorpay.com/docs/api/recurring-payments/upi/tokens/#22-fetch-tokens-by-customer-id 
+    # https://razorpay.com/docs/api/recurring-payments/upi/tokens/#22-fetch-tokens-by-customer-id
     def fetchTokens
-      self.class.request.get "#{id}/tokens" 
+      request.get "#{id}/tokens"
     end
- 
-   # Fetch specific token 
+
+   # Fetch specific token
     def fetchToken(tokenId)
-      self.class.request.get "#{id}/tokens/#{tokenId}" 
+      request.get "#{id}/tokens/#{tokenId}"
     end
 
     def deleteToken(tokenId)
-      self.class.request.delete "#{id}/tokens/#{tokenId}" 
+      request.delete "#{id}/tokens/#{tokenId}"
     end
   end
 end

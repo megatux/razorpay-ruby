@@ -4,31 +4,31 @@ require 'razorpay/entity'
 module Razorpay
   # QrCode API allows you to create, close and fetch QR codes
   class QrCode < Entity
-    def self.request
-      Razorpay::Request.new('payments/qr_codes')
+    def request
+      Razorpay::Request.new(@client, 'payments/qr_codes')
     end
 
-    def self.create(options)
+    def create(options)
         if(!options.is_a?(String) && options.key?(:fixed_amount))
            options[:fixed_amount] = (options[:fixed_amount] ? 1 : 0)
-        end  
+        end
       request.create options
     end
 
-    def self.fetch(id)
+    def fetch(id)
       request.fetch id
     end
 
-    def self.all(options = {})
+    def all(options = {})
       request.all options
     end
 
     def fetch_payments(options = {})
-      self.class.request.get "#{id}/payments", options
+      request.get "#{id}/payments", options
     end
 
     def close
-      self.class.request.post "#{id}/close"
+      request.post "#{id}/close"
     end
   end
 end

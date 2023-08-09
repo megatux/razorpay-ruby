@@ -4,6 +4,7 @@ module Razorpay
   # Tests for Razorpay::Refund
   class RazorpayRefundTest < Minitest::Test
     def setup
+      @client = RazorpayClient.new('key_id', 'key_secret')
       @payment_id = 'fake_payment_id'
       stub_get(%r{payments/#{@payment_id}$}, 'fake_payment')
       @refund_id = 'fake_refund_id'
@@ -16,25 +17,25 @@ module Razorpay
 
     def test_fetch_all_refunds_for_payment
       stub_get(%r{payments/#{@payment_id}/refunds$}, 'refund_collection_for_payment')
-      refunds = Razorpay::Payment.fetch(@payment_id).refunds
+      refunds = Razorpay::Payment.new(@client).fetch(@payment_id).refunds
       assert_instance_of Razorpay::Collection, refunds
     end
 
     def test_fetch_all_refunds
       stub_get(/refunds$/, 'refund_collection')
-      refunds = Razorpay::Refund.all
+      refunds = Razorpay::Refund.new(@client).all
       assert_instance_of Razorpay::Collection, refunds
     end
 
     def test_fetch_specific_refund
-      refund = Razorpay::Refund.fetch(@refund_id)
+      refund = Razorpay::Refund.new(@client).fetch(@refund_id)
       assert_instance_of Razorpay::Refund, refund
       assert_equal refund.id, @refund_id
     end
 
     def test_create_refund
       stub_post(/refunds$/, 'fake_refund', "payment_id=#{@payment_id}")
-      refund = Razorpay::Refund.create(payment_id: @payment_id)
+      refund = Razorpay::Refund.new(@client).create(payment_id: @payment_id)
       assert_instance_of Razorpay::Refund, refund
       assert_equal refund.id, @refund_id
     end
@@ -47,10 +48,10 @@ module Razorpay
         }
       }
       stub_patch(%r{/refunds/#{@refund_id}$}, 'fake_refund', para_attr.to_json)
-      refund = Razorpay::Refund.fetch(@refund_id).edit(para_attr.to_json)
+      refund = Razorpay::Refund.new(@client).fetch(@refund_id).edit(para_attr.to_json)
       assert_instance_of Razorpay::Refund, refund
       assert_equal refund.id, @refund_id
     end
-  end  
+  end
 end
 

@@ -4,6 +4,7 @@ module Razorpay
   # Tests for Razorpay::Plan
   class RazorpayPlanTest < Minitest::Test
     def setup
+      @client = RazorpayClient.new('key_id', 'key_secret')
       @plan_id = 'fake_plan_id'
 
       # Any request that ends with plans/plan_id
@@ -16,13 +17,13 @@ module Razorpay
     end
 
     def test_all_plans
-      plans = Razorpay::Plan.all
+      plans = Razorpay::Plan.new(@client).all
       assert_instance_of Razorpay::Collection, plans, 'Plans should be an array'
       assert !plans.items.empty?, 'Plans should be more than one'
     end
 
     def test_plan_should_be_available
-      plan = Razorpay::Plan.fetch(@plan_id)
+      plan = Razorpay::Plan.new(@client).fetch(@plan_id)
       assert_instance_of Razorpay::Plan, plan, 'Plan not an instance of Plan class'
       assert_equal @plan_id, plan.id, 'Plan IDs do not match'
       assert_equal 1, plan.interval, 'Plan interval is accessible'
@@ -44,7 +45,7 @@ module Razorpay
 
       stub_post(/plans$/, 'fake_plan', plan_attrs.to_json)
 
-      plan = Razorpay::Plan.create plan_attrs.to_json
+      plan = Razorpay::Plan.new(@client).create plan_attrs.to_json
 
       assert_equal 1, plan.interval, 'Plan interval is accessible'
       assert_equal 'monthly', plan.period, 'Plan period is accessible'
