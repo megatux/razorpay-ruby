@@ -5,10 +5,11 @@ module Razorpay
   # This saves data in a hash internally, and makes it available
   # via direct methods
   class Entity
-    attr_reader :attributes
+    attr_reader :attributes, :configuration
 
-    def initialize(attributes)
+    def initialize(attributes, configuration = nil)
       @attributes = attributes
+      @configuration = configuration
     end
 
     # This method fakes attr_reader, but uses
@@ -40,6 +41,7 @@ module Razorpay
     def with_a_bang
       mutated_entity = yield
       @attributes = mutated_entity.attributes
+      @configuration = mutated_entity.configuration
       mutated_entity
     end
   end

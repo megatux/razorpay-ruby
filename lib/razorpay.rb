@@ -1,3 +1,4 @@
+require 'razorpay/configuration'
 require 'razorpay/card'
 require 'razorpay/order'
 require 'razorpay/errors'

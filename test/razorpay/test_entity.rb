@@ -7,6 +7,8 @@ module Razorpay
     def setup
       @hash = { 'a' => 1 }
       @entity = Entity.new(@hash)
+      @config = Razorpay::Configuration.new('a', 'b')
+      @entity_with_config = Entity.new(@hash, @config)
     end
 
     def test_create_instance
@@ -38,18 +40,27 @@ module Razorpay
 
     def test_attribute_get
       assert_equal @hash['a'], @entity.a
+      assert_equal @hash['a'], @entity_with_config.a
     end
 
     def test_json_conversion
       assert_equal '{"a":1}', @entity.to_json
+      assert_equal '{"a":1}', @entity_with_config.to_json
     end
 
     def test_json_conversion_with_args
       assert_equal '{"a": 1}', @entity.to_json(space: ' ')
+      assert_equal '{"a": 1}', @entity_with_config.to_json(space: ' ')
     end
 
     def test_invalid_attribute_get
       assert_raises(NoMethodError, 'It must raise a NoMethodError on invalid attribute') { @entity.b }
+      assert_raises(NoMethodError, 'It must raise a NoMethodError on invalid attribute') { @entity_with_config.b }
+    end
+
+    def test_configuration_attribute
+      assert_nil @entity.configuration
+      assert_same @config, @entity_with_config.configuration
     end
   end
 end
