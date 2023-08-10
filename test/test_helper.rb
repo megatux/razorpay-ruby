@@ -13,10 +13,10 @@ def fixture_file(filename)
   File.read(file_path)
 end
 
-def stub_response(_url, filename, status = nil)
+def stub_response(_url, filename, status = nil, extra_headers = {})
   response = { body: fixture_file(filename) }
   response[:status] = status unless status.nil?
-  response.merge!(headers: { 'Content-Type' => 'application/json' })
+  response.merge!(headers: { 'Content-Type' => 'application/json' }.merge(extra_headers))
 end
 
 def stub_get(*args)

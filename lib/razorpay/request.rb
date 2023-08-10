@@ -11,17 +11,20 @@ module Razorpay
 
     ssl_ca_file File.dirname(__FILE__) + '/../ca-bundle.crt'
 
-    def initialize(entity_name = nil)
+    def initialize(entity_name = nil, configuration = nil)
       self.class.base_uri(Razorpay::BASE_URI)
       @entity_name = entity_name
-      custom_headers = Razorpay.custom_headers || {}
+      @configuration = configuration
+
+      custom_headers = @configuration ? @configuration[:custom_headers] : Razorpay.custom_headers
+      custom_headers = custom_headers || {}
       predefined_headers = {
         'User-Agent' => "Razorpay-Ruby/#{Razorpay::VERSION}; Ruby/#{RUBY_VERSION}"
       }
       # Order is important to give precedence to predefined headers
       headers = custom_headers.merge(predefined_headers)
       @options = {
-        basic_auth: Razorpay.auth,
+        basic_auth: @configuration ? @configuration.auth : Razorpay.auth,
         timeout: 30,
         headers: headers
       }
@@ -42,7 +45,7 @@ module Razorpay
     def get(url, data = {})
       request :get, "/#{@entity_name}/#{url}", data
     end
-    
+
     def delete(url)
       request :delete, "/#{@entity_name}/#{url}"
     end
@@ -63,14 +66,14 @@ module Razorpay
       create_instance raw_request(method, url, data)
     end
 
-    def raw_request(method, url, data = {}) 
+    def raw_request(method, url, data = {})
       case method
       when :get
         @options[:query] = data
       when :post, :put, :patch
         @options[:body] = data
       end
-      
+
       self.class.send(method, url, @options)
     end
 
@@ -86,8 +89,8 @@ module Razorpay
 
       if response.is_a?(Array)==true || response.to_s.length == 0
         return response
-      end 
-      
+      end
+
       # if there was an error, throw it
       raise_error(response['error'], res.code) if response.nil? || response.key?('error') && res.code !=200
       # There must be a top level entity

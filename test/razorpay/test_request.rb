@@ -11,5 +11,14 @@ module Razorpay
       res = req.raw_request(:get, 'https://api.razorpay.com')
       assert_equal 'Welcome to Razorpay API.', JSON.parse(res.body)['message']
     end
+
+    def test_raw_request_with_configuration
+      extra_headers = { key: 'value' }
+      stub_get('https://api.razorpay.com', 'welcome', extra_headers)
+
+      req = Razorpay::Request.new nil, Configuration.new('abc', '123', extra_headers)
+      res = req.raw_request(:get, 'https://api.razorpay.com')
+      assert_equal 'Welcome to Razorpay API.', JSON.parse(res.body)['message']
+    end
   end
 end
