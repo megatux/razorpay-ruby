@@ -10,7 +10,7 @@ module Razorpay
     def self.request
       Razorpay::Request.new('payments')
     end
-    
+
     def self.create_recurring_payment(data={})
       request.post "create/recurring" , data
     end
@@ -28,17 +28,17 @@ module Razorpay
     end
 
     def self.fetch_card_details(id)
-      request.get "#{id}/card"  
+      request.get "#{id}/card"
     end
-    
+
     def fetch_transfer
-      self.class.request.get "#{id}/transfers"  
+      self.class.request.get "#{id}/transfers"
     end
 
     def fetch_refund(refundId)
-      self.class.request.get "#{id}/refunds/#{refundId}"  
+      self.class.request.get "#{id}/refunds/#{refundId}"
     end
-    
+
     def self.fetch_multiple_refund(id, options = {})
       request.get "#{id}/refunds",options
     end
@@ -108,7 +108,7 @@ module Razorpay
     def self.create_upi(data={})
       request.post "create/upi" , data
     end
-    
+
     def self.validate_vpa(data={})
       request.post "validate/vpa" , data
     end
