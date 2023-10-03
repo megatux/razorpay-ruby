@@ -16,8 +16,7 @@ module Razorpay
       @entity_name = entity_name
       @configuration = configuration
 
-      custom_headers = @configuration ? @configuration[:custom_headers] : Razorpay.custom_headers
-      custom_headers = custom_headers || {}
+      custom_headers = @configuration&.custom_headers || Razorpay.custom_headers || {}
       predefined_headers = {
         'User-Agent' => "Razorpay-Ruby/#{Razorpay::VERSION}; Ruby/#{RUBY_VERSION}"
       }
