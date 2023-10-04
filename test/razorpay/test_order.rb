@@ -23,6 +23,17 @@ module Razorpay
       assert_equal 'TEST', order.receipt
     end
 
+    def test_order_should_be_created__with_custom_configuration
+      stub_post(/orders$/, 'fake_order', 'amount=5000&currency=INR&receipt=TEST')
+      order = Razorpay::Order.create(
+        { amount: 5000, currency: 'INR', receipt: 'TEST' },
+        Razorpay::Configuration.new('name', 'pwd')
+      )
+      assert_equal 5000, order.amount
+      assert_equal 'INR', order.currency
+      assert_equal 'TEST', order.receipt
+    end
+
     def test_orders_should_be_fetched
       order = Razorpay::Order.fetch(@order_id)
       assert_instance_of Razorpay::Order, order, 'order not an instance of Razorpay::Order class'
@@ -36,6 +47,13 @@ module Razorpay
       assert !orders.items.empty?, 'orders should be more than one'
     end
 
+    def test_fetching_all_orders__with_custom_configuration
+      stub_get(/orders$/, 'order_collection')
+      orders = Razorpay::Order.all({}, Razorpay::Configuration.new('user', 'pwd123'))
+      assert_instance_of Razorpay::Collection, orders, 'Orders should be an array'
+      assert !orders.items.empty?, 'orders should be more than one'
+    end
+
     def test_order_payments_should_be_fetched
       stub_get(%r{orders/#{@order_id}/payments$}, 'order_payments')
 
@@ -45,14 +63,23 @@ module Razorpay
       assert_equal 'pay_50sbkZA9AcyE5a', payments.items[0]['id'], 'payment id should match'
     end
 
-   def test_edit_order
+    def test_order_payments_should_be_fetched__with_configuration
+      stub_get(%r{orders/#{@order_id}/payments$}, 'order_payments')
+
+      payments = Razorpay::Order.fetch(@order_id, Razorpay::Configuration.new('user', 'pwd123')).payments
+      assert_instance_of Razorpay::Collection, payments, 'Payments should be an array'
+      assert !payments.items.empty?, 'payments should be more than one'
+      assert_equal 'pay_50sbkZA9AcyE5a', payments.items[0]['id'], 'payment id should match'
+    end
+
+    def test_edit_order
       param_attr = {
         "notes": {
           "key1": "value3",
           "key2": "value2"
         }
       }
-     
+
       stub_patch(%r{orders/#{@order_id}$}, 'fake_order', param_attr.to_json)
       order = Razorpay::Order.edit(@order_id, param_attr.to_json)
       assert_instance_of Razorpay::Order, order, 'order not an instance of Razorpay::Order class'
@@ -66,6 +93,6 @@ module Razorpay
     assert_equal @order_id, order.id, 'order IDs do not match'
     refute_empty order.transfers["items"]
     assert_equal @transfer_id, order.transfers["items"][0]["id"]
-   end 
+   end
   end
 end
