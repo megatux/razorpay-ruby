@@ -84,15 +84,24 @@ module Razorpay
       order = Razorpay::Order.edit(@order_id, param_attr.to_json)
       assert_instance_of Razorpay::Order, order, 'order not an instance of Razorpay::Order class'
       assert_equal @order_id, order.id, 'order IDs do not match'
-   end
+    end
 
-   def test_fetch_order_transfers
-    stub_get("#{BASE_URI}orders/#{@order_id}/?expand[]=transfers&status", 'fake_order_transfers')
-    order = Razorpay::Order.fetch_transfer_order(@order_id)
-    assert_instance_of Razorpay::Order, order, 'order not an instance of Razorpay::Order class'
-    assert_equal @order_id, order.id, 'order IDs do not match'
-    refute_empty order.transfers["items"]
-    assert_equal @transfer_id, order.transfers["items"][0]["id"]
-   end
+    def test_fetch_order_transfers
+      stub_get("#{BASE_URI}orders/#{@order_id}/?expand[]=transfers&status", 'fake_order_transfers')
+      order = Razorpay::Order.fetch_transfer_order(@order_id)
+      assert_instance_of Razorpay::Order, order, 'order not an instance of Razorpay::Order class'
+      assert_equal @order_id, order.id, 'order IDs do not match'
+      refute_empty order.transfers["items"]
+      assert_equal @transfer_id, order.transfers["items"][0]["id"]
+    end
+
+    def test_fetch_order_transfers__with_configuration
+      stub_get("#{BASE_URI}orders/#{@order_id}/?expand[]=transfers&status", 'fake_order_transfers')
+      order = Razorpay::Order.fetch_transfer_order(@order_id, Razorpay::Configuration.new('user', 'pwd123'))
+      assert_instance_of Razorpay::Order, order, 'order not an instance of Razorpay::Order class'
+      assert_equal @order_id, order.id, 'order IDs do not match'
+      refute_empty order.transfers["items"]
+      assert_equal @transfer_id, order.transfers["items"][0]["id"]
+    end
   end
 end
