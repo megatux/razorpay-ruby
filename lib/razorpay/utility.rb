@@ -3,22 +3,22 @@ require 'openssl'
 module Razorpay
   # Helper functions are defined here
   class Utility
-    def self.verify_payment_signature(attributes)
+    def self.verify_payment_signature(attributes, configuration = nil)
       signature = attributes.delete(:razorpay_signature)
 
       # Data requires the values to be in sorted order of their keys.
       # attributes.sort returns a nested array, and the last
       # element of each is the value. These are joined.
       data = attributes.sort.map(&:last).join('|')
-      secret = Razorpay.auth[:password]
+      secret = configuration&.password || Razorpay.auth[:password]
       verify_signature(data, signature, secret)
     end
 
-    def self.verify_payment_link_signature(attributes)
+    def self.verify_payment_link_signature(attributes, configuration = nil)
       signature = attributes.delete(:razorpay_signature)
       # element of each is the value. These are joined.
       data = attributes.values.join('|')
-      secret = Razorpay.auth[:password]
+      secret = configuration&.password || Razorpay.auth[:password]
       verify_signature(data, signature, secret)
     end
 
